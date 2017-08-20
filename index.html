@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+  <title>Ajax Polling</title>
+  <meta charset="UTF-8" />
+</head>
+<body>
+  <p>Response: <span class="response"></span></p>
+
+  <img src="background.png">
+
+  <h3 id="game-filter" class="gamesection">
+           <span>Game</span></h3>
+        <div id="game-filter-div" style="padding: 0;">
+            <ul id="textlist">
+            </ul>
+        </div>
+
+  <form id="searchForm">
+  <input type="text" name="playername" placeholder="Name"> <br>
+  <input type="radio" name="position" value="p1" checked> Bulbasaur<br>
+  <input type="radio" name="position" value="p2"> Charmander<br>
+  <input type="submit" value="Submit">
+</form>
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script>
+    $( "#searchForm" ).submit(function( event ) {
+
+      // Stop form from submitting normally
+      event.preventDefault();
+
+      var $form = $( this ),
+        name = $form.find( "input[name='playername']" ).val(),
+        pos = $form.find( "input[name='position']:checked" ).val();
+
+      var command = '"source":0,"target":1,"move":0'
+      if (pos == "p2") {
+        command = '"source":1,"target":0,"move":0'
+      }
+
+      var response = $('.response'),
+        move = function() {
+          $.ajax({
+            url: 'http://localhost:8080/move',
+            data: '{"player":"'+name+'","command":{'+command+'}}',
+            dataType: 'json',
+            type: 'post',
+            success: function(data) { 
+                response.text(JSON.stringify(data));
+
+                var list = "";
+                for(i=0; i<data.length; i++){
+                      list +="<li>"+JSON.stringify(data[i])+"</li>";
+                }
+                $("#textlist").append(list);
+
+            },
+            error: function() {
+              console.log('Error!');
+            }
+          });
+        }
+        move();
+    });
+  </script>
+</body>
+</html>
