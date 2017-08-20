@@ -1,0 +1,24 @@
+ .containerdiv {
+    border: 0;
+    float: left;
+    position: relative;
+  } 
+  .selfimg {
+    border: 0;
+    position: absolute;
+    top: 190px;
+    right: 400px;
+   } 
+  .enemyimg {
+    border: 0;
+    position: absolute;
+    top: 80px;
+    right: 100px;
+   } 
+   .button {
+    border: 0;
+    position: absolute;
+   }
+   hr {
+    clear:both;
+  }

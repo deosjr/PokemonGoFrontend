@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <head>
-  <title>Ajax Polling</title>
+  <title>PokemonGo</title>
   <meta charset="UTF-8" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <p>Response: <span class="response"></span></p>
 
-  <img src="background.png">
+  <div class="containerdiv">
+    <img src="background.png">
+    <img id="selfimg" class="selfimg">
+    <img id="enemyimg" class="enemyimg">
+
+    <button style="top: 280px;right: 400px;" class="button" onclick="move()">Move 1</button>
+    <button style="top: 280px;right: 200px;" class="button" onclick="move()">Move 2</button>
+    <button style="top: 310px;right: 400px;" class="button" onclick="move()">Move 3</button>
+    <button style="top: 310px;right: 200px;" class="button" onclick="move()">Move 4</button>
+  </div><hr/>
 
   <h3 id="game-filter" class="gamesection">
            <span>Game</span></h3>
@@ -24,28 +34,22 @@
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <script>
-    $( "#searchForm" ).submit(function( event ) {
 
-      // Stop form from submitting normally
-      event.preventDefault();
+    var pos = "p1"
 
-      var $form = $( this ),
-        name = $form.find( "input[name='playername']" ).val(),
-        pos = $form.find( "input[name='position']:checked" ).val();
+    move = function() {
+          command = '"source":0,"target":1,"move":0' //p1
+          if (pos == "p2") {
+            command = '"source":1,"target":0,"move":0'
+          }
 
-      var command = '"source":0,"target":1,"move":0'
-      if (pos == "p2") {
-        command = '"source":1,"target":0,"move":0'
-      }
-
-      var response = $('.response'),
-        move = function() {
           $.ajax({
             url: 'http://localhost:8080/move',
             data: '{"player":"'+name+'","command":{'+command+'}}',
             dataType: 'json',
             type: 'post',
             success: function(data) { 
+                var response = $('.response')
                 response.text(JSON.stringify(data));
 
                 var list = "";
@@ -60,8 +64,25 @@
             }
           });
         }
-        move();
+
+    $( "#searchForm" ).submit(function( event ) {
+
+      // Stop form from submitting normally
+      event.preventDefault();
+
+      var $form = $( this ),
+        name = $form.find( "input[name='playername']" ).val(),
+        pos = $form.find( "input[name='position']:checked" ).val();
+
+      if (pos == "p1") {
+        $("#selfimg").attr("src","Spr_b_4p_001.png");
+        $("#enemyimg").attr("src","Spr_4h_004.png");
+      } else if (pos == "p2") {
+        $("#selfimg").attr("src","Spr_b_4p_004.png");
+        $("#enemyimg").attr("src","Spr_3f_001.png");
+      }
     });
+
   </script>
 </body>
 </html>
