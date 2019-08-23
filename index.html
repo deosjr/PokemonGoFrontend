@@ -5,17 +5,16 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <p>Response: <span class="response"></span></p>
 
   <div class="containerdiv">
     <img src="background.png">
     <img id="selfimg" class="selfimg">
     <img id="enemyimg" class="enemyimg">
 
-    <button style="top: 280px;right: 400px;" class="button" onclick="move()">Move 1</button>
-    <button style="top: 280px;right: 200px;" class="button" onclick="move()">Move 2</button>
-    <button style="top: 310px;right: 400px;" class="button" onclick="move()">Move 3</button>
-    <button style="top: 310px;right: 200px;" class="button" onclick="move()">Move 4</button>
+    <button style="top: 280px;right: 400px;" id="m1" class="button" onclick="move(0)">Move 1</button>
+    <button style="top: 280px;right: 200px;" id="m2" class="button" onclick="move(1)">Move 2</button>
+    <button style="top: 310px;right: 400px;" id="m3" class="button" onclick="move(2)">Move 3</button>
+    <button style="top: 310px;right: 200px;" id="m4" class="button" onclick="move(3)">Move 4</button>
   </div><hr/>
 
   <h3 id="game-filter" class="gamesection">
@@ -26,27 +25,43 @@
         </div>
 
   <form id="searchForm">
-  <input type="text" name="playername" placeholder="Name"> <br>
-  <input type="radio" name="position" value="p1" checked> Bulbasaur<br>
-  <input type="radio" name="position" value="p2"> Charmander<br>
-  <input type="submit" value="Submit">
-</form>
+    <input type="radio" name="position" value="p1" checked> Bulbasaur<br>
+    <input type="radio" name="position" value="p2"> Charmander<br>
+    <input type="submit" value="Switch">
+  </form>
 
+  <h3> Start new game </h3>
+
+  <form id="gameForm">
+    <input type="text" name="gamename" placeholder="Game name"> <br>
+    <input type="text" name="p1name" placeholder="p1 name"> <br>
+    <input type="text" name="p2name" placeholder="p2 name"> <br>
+    <input type="submit" value="Start">
+  </form>
+
+  <h3> Join game </h3>
+
+  <form id="joinForm">
+    <input type="text" name="gamename" placeholder="Game name"> <br>
+    <input type="text" name="playername" placeholder="player name"> <br>
+    <input type="submit" value="Join">
+  </form>
+  
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <script>
 
     window.pos = "p1"
     window.name = "player1"
 
-    move = function() {
-          command = '"source":0,"target":1,"move":0' //p1
+    move = function(i) {
+          command = '"source":0,"target":1,"move":'+i //p1
           if (window.pos == "p2") {
-            command = '"source":1,"target":0,"move":0'
+            command = '"source":1,"target":0,"move":'+i
           }
 
           $.ajax({
             url: 'http://localhost:8080/move',
-            data: '{"game":"test","player":"'+window.name+'","command":{'+command+'}}',
+            data: '{"game":"'+window.gamename+'","player":"'+window.name+'","command":{'+command+'}}',
             dataType: 'json',
             type: 'post',
             success: function(data) { 
@@ -62,31 +77,82 @@
             },
             error: function() {
               console.log('Error!');
-            }
-          });
-        }
-
+            } }); } 
     $( "#searchForm" ).submit(function( event ) {
 
       // Stop form from submitting normally
       event.preventDefault();
 
       var $form = $( this ),
-        name = $form.find( "input[name='playername']" ).val(),
         pos = $form.find( "input[name='position']:checked" ).val();
-
-        window.name = name;
         window.pos = pos;
 
-      if (pos == "p1") {
-        $("#selfimg").attr("src","Spr_b_4p_001.png");
-        $("#enemyimg").attr("src","Spr_4h_004.png");
-      } else if (pos == "p2") {
-        $("#selfimg").attr("src","Spr_b_4p_004.png");
-        $("#enemyimg").attr("src","Spr_3f_001.png");
-      }
     });
 
+    $( "#gameForm" ).submit(function( event ) {
+
+      // Stop form from submitting normally
+      event.preventDefault();
+
+      var $form = $( this ),
+        gamename = $form.find( "input[name='gamename']" ).val(),
+        p1name = $form.find( "input[name='p1name']" ).val(),
+        p2name = $form.find( "input[name='p2name']" ).val();
+      window.gamename = gamename 
+
+      $.ajax({
+        url: 'http://localhost:8080/game',
+        data: '{"name":"'+window.gamename+'","p1":"'+p1name+'","p2":"'+p2name+'"}',
+        dataType: 'json',
+        type: 'post',
+        success: function(data) { 
+            var response = $('.response')
+            response.text(JSON.stringify(data));
+        },
+        error: function() {
+          console.log('Error!');
+        }
+      });
+    });
+
+    $( "#joinForm" ).submit(function( event ) {
+
+      // Stop form from submitting normally
+      event.preventDefault();
+
+      var $form = $( this ),
+        gamename = $form.find( "input[name='gamename']" ).val(),
+        pname = $form.find( "input[name='playername']" ).val();
+      window.gamename = gamename 
+
+      $.ajax({
+        url: 'http://localhost:8080/join',
+        data: '{"name":"'+window.gamename+'","player":"'+pname+'"}',
+        dataType: 'json',
+        type: 'post',
+        success: function(data) { 
+            var response = $('.response')
+            response.text(JSON.stringify(data));
+
+            // set images
+            selfID = data.self.toString().padStart(3, '0');
+            oppID = data.opp.toString().padStart(3, '0');
+            url = "https://raw.githubusercontent.com/deosjr/PokeCiv/master/Data/Graphics/Gen6Animations/"
+            $("#selfimg").attr("src",url+selfID+"b.gif");
+            $("#enemyimg").attr("src", url+oppID+".gif");
+
+            // set moves
+            document.getElementById("m1").innerHTML = data.moves[0];
+            document.getElementById("m2").innerHTML = data.moves[1];
+            document.getElementById("m3").innerHTML = data.moves[2];
+            document.getElementById("m4").innerHTML = data.moves[3];
+
+        },
+        error: function() {
+          console.log('Error!');
+        }
+      });
+    });
   </script>
 </body>
 </html>
