@@ -24,12 +24,6 @@
             </ul>
         </div>
 
-  <form id="searchForm">
-    <input type="radio" name="position" value="p1" checked> Bulbasaur<br>
-    <input type="radio" name="position" value="p2"> Charmander<br>
-    <input type="submit" value="Switch">
-  </form>
-
   <h3> Start new game </h3>
 
   <form id="gameForm">
@@ -50,18 +44,10 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <script>
 
-    window.pos = "p1"
-    window.name = "player1"
-
     move = function(i) {
-          command = '"source":0,"target":1,"move":'+i //p1
-          if (window.pos == "p2") {
-            command = '"source":1,"target":0,"move":'+i
-          }
-
           $.ajax({
             url: 'http://localhost:8080/move',
-            data: '{"game":"'+window.gamename+'","player":"'+window.name+'","command":{'+command+'}}',
+            data: '{"game":"'+window.gamename+'","player":"'+window.playername+'","move":'+i+'}',
             dataType: 'json',
             type: 'post',
             success: function(data) { 
@@ -78,16 +64,6 @@
             error: function() {
               console.log('Error!');
             } }); } 
-    $( "#searchForm" ).submit(function( event ) {
-
-      // Stop form from submitting normally
-      event.preventDefault();
-
-      var $form = $( this ),
-        pos = $form.find( "input[name='position']:checked" ).val();
-        window.pos = pos;
-
-    });
 
     $( "#gameForm" ).submit(function( event ) {
 
@@ -122,12 +98,13 @@
 
       var $form = $( this ),
         gamename = $form.find( "input[name='gamename']" ).val(),
-        pname = $form.find( "input[name='playername']" ).val();
+        playername = $form.find( "input[name='playername']" ).val();
       window.gamename = gamename 
+      window.playername = playername
 
       $.ajax({
         url: 'http://localhost:8080/join',
-        data: '{"name":"'+window.gamename+'","player":"'+pname+'"}',
+        data: '{"name":"'+window.gamename+'","player":"'+playername+'"}',
         dataType: 'json',
         type: 'post',
         success: function(data) { 
