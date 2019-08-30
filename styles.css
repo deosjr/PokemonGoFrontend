@@ -6,15 +6,27 @@
   .selfimg {
     border: 0;
     position: absolute;
-    top: 190px;
+    bottom: 0px;
     right: 400px;
    } 
   .enemyimg {
     border: 0;
     position: absolute;
-    top: 80px;
+    top: 90px;
     right: 100px;
    } 
+   .playerbase {
+    border: 0;
+    position: absolute;
+    bottom: 0px;
+    right: 200px;
+   }
+   .enemybase {
+    border: 0;
+    position: absolute;
+    top: 100px;
+    right: 0px;
+   }
    .button {
     border: 0;
     position: absolute;
